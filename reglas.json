@@ -1,0 +1,105 @@
+
+{
+  "segments": [
+    {"id": "S1", "name": "Tech Lover"},
+    {"id": "S2", "name": "Foodie/Cocinillas"},
+    {"id": "S3", "name": "Wellness & Fitness"},
+    {"id": "S4", "name": "Fashion/Beauty"},
+    {"id": "S5", "name": "Cultura/Lector"},
+    {"id": "S6", "name": "Gamer"},
+    {"id": "S7", "name": "Música/Audiophile"},
+    {"id": "S8", "name": "Outdoor/Deporte"},
+    {"id": "S9", "name": "Experiencias/Viajes"},
+    {"id": "S10", "name": "DIY/Creativo"},
+    {"id": "S11", "name": "Home & Deco"},
+    {"id": "S12", "name": "Eco & Sostenible"},
+    {"id": "S13", "name": "Mascotas"},
+    {"id": "S14", "name": "Infantil (0–12)"},
+    {"id": "S15", "name": "Adolescente (13–17)"},
+    {"id": "S16", "name": "Romántico (Pareja)"},
+    {"id": "S17", "name": "Premium/Alta gama"},
+    {"id": "S18", "name": "Rápido/Digital"}
+  ],
+  "rules": [
+    {
+      "field": "intereses",
+      "logic": [
+        {"contains_any": ["Tecnología", "Gadgets"], "action": {"segments.add": ["S1"]}},
+        {"contains_any": ["Cocina", "Gastronomía"], "action": {"segments.add": ["S2"]}},
+        {"contains_any": ["Bienestar", "Fitness", "Yoga"], "action": {"segments.add": ["S3"]}},
+        {"contains_any": ["Moda", "Estilo", "Belleza"], "action": {"segments.add": ["S4"]}},
+        {"contains_any": ["Libros", "Lectura", "Cultura"], "action": {"segments.add": ["S5"]}},
+        {"contains_any": ["Gaming", "Videojuegos"], "action": {"segments.add": ["S6"]}},
+        {"contains_any": ["Música", "Audio"], "action": {"segments.add": ["S7"]}},
+        {"contains_any": ["Deporte", "Aire libre", "Montaña"], "action": {"segments.add": ["S8"]}},
+        {"contains_any": ["Viajes", "Experiencias"], "action": {"segments.add": ["S9"]}},
+        {"contains_any": ["Manualidades", "Creatividad", "DIY"], "action": {"segments.add": ["S10"]}},
+        {"contains_any": ["Decoración", "Hogar"], "action": {"segments.add": ["S11"]}},
+        {"contains_any": ["Sostenibilidad", "Eco"], "action": {"segments.add": ["S12"]}},
+        {"contains_any": ["Mascotas", "Perro", "Gato"], "action": {"segments.add": ["S13"]}}
+      ]
+    },
+    {
+      "field": "edad",
+      "logic": [
+        {"range": [0, 12], "action": {"segments.add": ["S14"]}},
+        {"range": [13, 17], "action": {"segments.add": ["S15"]}}
+      ]
+    },
+    {
+      "field": "para_quien",
+      "logic": [
+        {"equals_any": ["Pareja", "Esposo", "Esposa", "Novio", "Novia"], "action": {"segments.add": ["S16"]}}
+      ]
+    },
+    {
+      "field": "estilo_regalo",
+      "logic": [
+        {"equals": "Experiencia", "action": {"segments.add": ["S9"]}},
+        {"equals": "Premium/lujo", "action": {"segments.add": ["S17"]}},
+        {"equals": "Personalizado", "action": {"boost_tags": ["personalizado"]}},
+        {"equals": "Útil/práctico", "action": {"boost_tags": ["practico"]}}
+      ]
+    },
+    {
+      "field": "presupuesto",
+      "logic": [
+        {"range": [0, 19], "action": {"budget_bucket": "<20"}},
+        {"range": [20, 50], "action": {"budget_bucket": "20-50"}},
+        {"range": [51, 100], "action": {"budget_bucket": "50-100"}},
+        {"range": [101, 200], "action": {"budget_bucket": "100-200"}},
+        {"greater_or_equal": 201, "action": {"budget_bucket": ">200", "segments.add": ["S17"]}}
+      ]
+    },
+    {
+      "field": "preferencias_logisticas",
+      "logic": [
+        {"contains": "Entrega rápida", "action": {"segments.add": ["S18"], "boost_tags": ["envio_48h"]}},
+        {"contains": "Regalo digital", "action": {"segments.add": ["S18"], "boost_tags": ["digital"]}},
+        {"contains": "Envío internacional", "action": {"boost_tags": ["envio_internacional"]}}
+      ]
+    },
+    {
+      "field": "aversiones",
+      "logic": [
+        {"contains": "Evitar alcohol", "action": {"filters.exclude_tags": ["alcohol", "cata", "cocteleria"]}},
+        {"contains": "Evitar perfumes/cosmética", "action": {"filters.exclude_tags": ["perfume", "cosmetica"]}},
+        {"contains": "Evitar productos animales", "action": {"filters.exclude_tags": ["cuero", "lana", "piel"]}},
+        {"contains": "Evitar tecnología", "action": {"segments.remove": ["S1", "S6", "S7"]}},
+        {"contains": "Evitar multijuegos/ruidos", "action": {"filters.exclude_tags": ["ruidoso"]}},
+        {"contains": "Alergias/alimentos", "action": {"filters.exclude_tags": ["alimentacion_riesgo"]}}
+      ]
+    }
+  ],
+  "post_processing": {
+    "limit_primary_segments": 3,
+    "priority": [
+      "S14", "S15",
+      "S16",
+      "S9",
+      "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S10", "S11", "S12", "S13",
+      "S17", "S18"
+    ],
+    "idea_count_range": [8, 15]
+  }
+}
